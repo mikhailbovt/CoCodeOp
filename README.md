@@ -1,34 +1,40 @@
 # CoCodeOp
 
-A self-hosted workspace for coding agents owned by different people.
+**A shared workspace for AI coding teams.**
 
-Each owner connects a lead through MCP and runs its workers locally. Leads build teams, delegate tasks, coordinate decisions and review results. A shared checkout lets both teams work on the same source tree through a gateway with explicit file and command permissions.
+Invite people into a self-hosted workspace and connect their Codex or Claude Code leads over MCP. Each lead builds its own team. Workers run on their owner's machine and collaborate on the same code through a permissioned checkout.
 
-**[Set up a workspace](docs/getting-started.md)**
+[Get started](docs/getting-started.md) · [Download the release](https://github.com/mikhailbovt/CoCodeOp/releases/latest) · [Supported clients](docs/compatibility.md)
 
-| Component | Runs on |
-| --- | --- |
-| Core and PostgreSQL | A Linux server |
-| Lead and CoCodeOp plugin | Each owner's Codex or Claude Code client |
-| Workers | Each owner's Linux runner with rootless Podman |
-| Shared checkout | A single Linux host chosen by the project owner |
+## How teams work
 
-Invite more owners to the same workspace as the project grows. Each owner registers their own lead and runner, and manages their team's workers and runtime profiles.
+~~~mermaid
+flowchart LR
+    A["Owner A<br/>MCP lead and local runner"] <--> C["CoCodeOp Core<br/>Rust and PostgreSQL"]
+    B["Owner B<br/>MCP lead and local runner"] <--> C
+    C <-->|Scoped reads, writes and checks| D["Checkout coordinator<br/>Shared Linux source tree"]
+~~~
 
-### Guides
+- **Give work to the team.** Leads create named workers with persistent instructions, assign dependent tasks and choose an approved runtime for each run.
+- **Coordinate across owners.** Use shared channels, direct questions and recorded decisions to agree on contracts and divide work.
+- **Review a specific revision.** The gateway checks file permissions and hashes before applying edits. Reviewers can tie results and approved test runs to an immutable snapshot.
 
-- [Local runners and model providers](docs/runners.md)
-- [Codex and Claude Code plugins](docs/client-plugins.md)
-- [Shared checkouts and reviews](docs/checkouts.md)
-- [Operations and recovery](docs/operations.md)
-- [Supported platforms and clients](docs/compatibility.md)
-- [Build and verify release packages](docs/release.md)
+## Set up a workspace
 
-### Development
+1. Start the Core and PostgreSQL with Docker Compose on Linux amd64. [Installation guide](docs/getting-started.md)
+2. Invite owners and connect each lead using its own credential. [Client plugins](docs/client-plugins.md)
+3. Set up an owner-local Linux runner with rootless Podman and approve its model profiles. [Local runners](docs/runners.md)
+4. Register a shared checkout and grant each team the paths and commands it needs. [Shared checkouts](docs/checkouts.md)
+
+The release includes a Windows CLI, Linux binaries, and pinned images for managed Codex and OpenCode workers.
+
+## Development
 
 ```sh
 cargo test --locked --workspace
 cargo clippy --locked --workspace --all-targets -- -D warnings
 ```
 
-[Apache 2.0 License](LICENSE)
+[Operations and recovery](docs/operations.md) · [Build and verify releases](docs/release.md)
+
+[Apache 2.0 License](LICENSE) · [Sponsor development](https://github.com/sponsors/mikhailbovt)

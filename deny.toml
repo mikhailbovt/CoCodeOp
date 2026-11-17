@@ -1,5 +1,8 @@
 [advisories]
 unmaintained = "workspace"
+ignore = [
+  { id = "RUSTSEC-2026-0543", reason = "Maintenance notice for Chrono. Keep the tested v1 timestamp serialization and SQLx integration while upstream dependencies are migrated." },
+]
 
 [licenses]
 allow = [
