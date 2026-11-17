@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CheckoutChangeReceipt",
+  "type": "object",
+  "properties": {
+    "author": {
+      "$ref": "#/$defs/Recipient"
+    },
+    "change_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "checkout_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "checkout_revision": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "claim_fence": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "compensates_change_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "coordinator_epoch": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "event_cursor": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/CheckoutFileDelta"
+      }
+    },
+    "host_runner_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "read_dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/CheckoutDependency"
+      }
+    },
+    "run_fence": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scope_revision": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "task_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "change_id",
+    "checkout_id",
+    "task_id",
+    "run_id",
+    "author",
+    "host_runner_id",
+    "coordinator_epoch",
+    "scope_revision",
+    "run_fence",
+    "claim_fence",
+    "checkout_revision",
+    "files",
+    "event_cursor"
+  ],
+  "$defs": {
+    "CheckoutDependency": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/SourcePath"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "CheckoutFileDelta": {
+      "type": "object",
+      "properties": {
+        "after_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "before_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/SourcePath"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ]
+    },
+    "Recipient": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "user_id"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    }
+  }
+}

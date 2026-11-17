@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BackendCapabilities",
+  "type": "object",
+  "properties": {
+    "can_cancel": {
+      "type": "boolean"
+    },
+    "can_resume": {
+      "type": "boolean"
+    },
+    "enforces_no_native_source_write": {
+      "type": "boolean"
+    },
+    "supports_approvals": {
+      "type": "boolean"
+    },
+    "supports_shared_gateway": {
+      "type": "boolean"
+    },
+    "supports_tools": {
+      "type": "boolean"
+    },
+    "supports_usage": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "can_resume",
+    "can_cancel",
+    "supports_approvals",
+    "supports_usage",
+    "supports_tools",
+    "supports_shared_gateway",
+    "enforces_no_native_source_write"
+  ]
+}

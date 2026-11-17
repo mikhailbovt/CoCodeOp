@@ -1,0 +1,437 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/AccessRequest"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "AccessApproval": {
+      "type": "object",
+      "properties": {
+        "approver": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "decided_by": {
+          "$ref": "#/$defs/Recipient"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "approver",
+        "decided_by",
+        "decided_at"
+      ]
+    },
+    "AccessRequest": {
+      "type": "object",
+      "properties": {
+        "access_request_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "approvals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AccessApproval"
+          }
+        },
+        "approvers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Recipient"
+          }
+        },
+        "area_revisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AreaRevision"
+          }
+        },
+        "base_scope_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "checkout_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "decision_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "effective_grant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "issued_scope_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "lead": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "needs_owner_grant": {
+          "type": "boolean"
+        },
+        "permissions": {
+          "$ref": "#/$defs/WorkPermissions"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "requester": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "run_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "scope_expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "scope_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "state": {
+          "$ref": "#/$defs/AccessRequestState"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "worker": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "access_request_id",
+        "task_id",
+        "checkout_id",
+        "scope_id",
+        "base_scope_revision",
+        "requester",
+        "worker",
+        "lead",
+        "reason",
+        "permissions",
+        "state",
+        "revision",
+        "expires_at",
+        "scope_expires_at",
+        "area_revisions",
+        "approvers",
+        "approvals",
+        "needs_owner_grant",
+        "effective_grant_id"
+      ]
+    },
+    "AccessRequestState": {
+      "type": "string",
+      "enum": [
+        "requested",
+        "approved_pending_apply",
+        "approved",
+        "rejected",
+        "cancelled",
+        "expired"
+      ]
+    },
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "AreaRevision": {
+      "type": "object",
+      "properties": {
+        "area_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "area_id",
+        "revision"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "PathAccess": {
+      "type": "object",
+      "properties": {
+        "allow": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        },
+        "deny": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "allow"
+      ]
+    },
+    "PathRule": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "file"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "directory"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "tree"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "Recipient": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "user_id"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    },
+    "WorkPermissions": {
+      "type": "object",
+      "properties": {
+        "change_executable": {
+          "type": "boolean",
+          "default": false
+        },
+        "command_template_ids": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "create_directories": {
+          "type": "boolean",
+          "default": false
+        },
+        "read": {
+          "$ref": "#/$defs/PathAccess"
+        },
+        "write": {
+          "$ref": "#/$defs/PathAccess"
+        },
+        "write_operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WriteOperation"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "read",
+        "write",
+        "write_operations"
+      ]
+    },
+    "WriteOperation": {
+      "type": "string",
+      "enum": [
+        "create",
+        "replace",
+        "delete",
+        "rename"
+      ]
+    }
+  }
+}

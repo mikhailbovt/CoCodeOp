@@ -1,0 +1,477 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/TaskExplanation"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "ExecutionTerminalReason": {
+      "type": "string",
+      "enum": [
+        "attempt_limit",
+        "eligibility_changed",
+        "start_interrupted",
+        "execution_failed",
+        "input_expired",
+        "emergency_stopped",
+        "restore_review_required"
+      ]
+    },
+    "Subject": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "human"
+            },
+            "user_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "user_id"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "agent_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "kind": {
+              "type": "string",
+              "const": "agent"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "agent_id"
+          ]
+        }
+      ]
+    },
+    "TaskCondition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "awaiting_owner"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "awaiting_review"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "awaiting_input"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "awaiting_stop_confirmation"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "dependencies"
+            },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "tasks"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "checkout_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "kind": {
+              "type": "string",
+              "const": "work_scope_required"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "execution_paused"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "capacity_limit"
+            },
+            "scope": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "scope"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "earliest": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "kind": {
+              "type": "string",
+              "const": "retry_delay"
+            }
+          },
+          "required": [
+            "kind",
+            "earliest"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "awaiting_compatible_runner"
+            },
+            "template_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "kind",
+            "template_id"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "awaiting_dispatch"
+            },
+            "template_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "kind",
+            "template_id"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "prepare"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "ready_for_assignment"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "in_progress"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "needs_attention"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "terminal"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ExecutionTerminalReason"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "TaskExplanation": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "$ref": "#/$defs/TaskCondition"
+        },
+        "job_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "next_actor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Subject"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "run_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "status": {
+          "$ref": "#/$defs/TaskStatus"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "task_revision": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "task_id",
+        "task_revision",
+        "status",
+        "observed_at",
+        "condition"
+      ]
+    },
+    "TaskStatus": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "ready",
+        "assigned",
+        "in_progress",
+        "blocked",
+        "in_review",
+        "changes_requested",
+        "done",
+        "cancelled",
+        "failed"
+      ]
+    }
+  }
+}

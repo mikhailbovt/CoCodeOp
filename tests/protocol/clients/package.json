@@ -1,0 +1,10 @@
+{
+  "name": "cocodeop-compat-clients",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@google/gemini-cli": "0.68.0",
+    "@openai/codex": "0.148.0",
+    "opencode-ai": "1.19.5"
+  }
+}

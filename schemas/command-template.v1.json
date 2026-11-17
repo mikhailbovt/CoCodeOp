@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/CommandTemplateReceipt"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "CommandArgument": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "literal"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "choice"
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "key",
+            "values"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "integer"
+            },
+            "maximum": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "minimum": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "key",
+            "minimum",
+            "maximum"
+          ]
+        }
+      ]
+    },
+    "CommandResources": {
+      "type": "object",
+      "properties": {
+        "build_cache": {
+          "type": "boolean",
+          "default": false
+        },
+        "package_cache": {
+          "type": "boolean",
+          "default": false
+        },
+        "test_database": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "CommandTemplateReceipt": {
+      "type": "object",
+      "properties": {
+        "checkout_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_cursor": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "template": {
+          "$ref": "#/$defs/CommandTemplateSpec"
+        },
+        "template_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "template_id",
+        "workspace_id",
+        "checkout_id",
+        "template",
+        "event_cursor"
+      ]
+    },
+    "CommandTemplateSpec": {
+      "type": "object",
+      "properties": {
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CommandArgument"
+          }
+        },
+        "executable": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "resources": {
+          "$ref": "#/$defs/CommandResources"
+        },
+        "scratch_outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        },
+        "source_inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "writable_staging": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "executable",
+        "arguments",
+        "source_inputs",
+        "scratch_outputs",
+        "timeout_seconds"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "PathRule": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "file"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "directory"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "tree"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    }
+  }
+}

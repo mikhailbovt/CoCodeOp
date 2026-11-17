@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/OperationsMetrics"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "CheckoutMetrics": {
+      "type": "object",
+      "properties": {
+        "claim_handoff": {
+          "$ref": "#/$defs/LatencyMetrics"
+        },
+        "newest_snapshot_age_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "publication": {
+          "$ref": "#/$defs/LatencyMetrics"
+        },
+        "reconciling_checkouts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "reconciling_checkouts",
+        "publication",
+        "claim_handoff"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "ExecutionMetrics": {
+      "type": "object",
+      "properties": {
+        "blocked_tasks": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "first_dispatch": {
+          "$ref": "#/$defs/LatencyMetrics"
+        },
+        "oldest_dispatch_wait_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "queued_jobs": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "reconciling_jobs": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "retries": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "running_attempts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "waiting_input_attempts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "queued_jobs",
+        "running_attempts",
+        "waiting_input_attempts",
+        "blocked_tasks",
+        "reconciling_jobs",
+        "first_dispatch",
+        "retries"
+      ]
+    },
+    "InboxMetrics": {
+      "type": "object",
+      "properties": {
+        "oldest_pending_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "pending_addressed": {
+          "description": "Addressed, visible human inbox events that remain within event retention.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "pending_addressed"
+      ]
+    },
+    "InstanceRejections": {
+      "type": "object",
+      "properties": {
+        "content_conflicts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "denied_actions": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "scope_denials": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "stale_fences": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "uptime_seconds": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "uptime_seconds",
+        "denied_actions",
+        "scope_denials",
+        "stale_fences",
+        "content_conflicts"
+      ]
+    },
+    "LatencyMetrics": {
+      "type": "object",
+      "properties": {
+        "p95_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "samples": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "samples"
+      ]
+    },
+    "OperationsMetrics": {
+      "type": "object",
+      "properties": {
+        "checkout": {
+          "$ref": "#/$defs/CheckoutMetrics"
+        },
+        "executions": {
+          "$ref": "#/$defs/ExecutionMetrics"
+        },
+        "inbox": {
+          "$ref": "#/$defs/InboxMetrics"
+        },
+        "instance_rejections": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstanceRejections"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "since": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "usage": {
+          "$ref": "#/$defs/UsageMetrics"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "observed_at",
+        "since",
+        "executions",
+        "usage",
+        "checkout",
+        "inbox"
+      ]
+    },
+    "UsageMetrics": {
+      "type": "object",
+      "properties": {
+        "cached_input_tokens": {
+          "type": "string"
+        },
+        "estimated_cost_attempts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "estimated_usd_micros": {
+          "type": "string"
+        },
+        "finished_managed_attempts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "input_tokens": {
+          "type": "string"
+        },
+        "measured_attempts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": "string"
+        },
+        "reasoning_output_tokens": {
+          "type": "string"
+        },
+        "reported_cost_attempts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "reported_usd_micros": {
+          "type": "string"
+        },
+        "unknown_cost_attempts": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "finished_managed_attempts",
+        "measured_attempts",
+        "input_tokens",
+        "output_tokens",
+        "cached_input_tokens",
+        "reasoning_output_tokens",
+        "reported_cost_attempts",
+        "reported_usd_micros",
+        "estimated_cost_attempts",
+        "estimated_usd_micros",
+        "unknown_cost_attempts"
+      ]
+    }
+  }
+}

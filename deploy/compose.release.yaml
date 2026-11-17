@@ -1,0 +1,5 @@
+services:
+  server:
+    build: !reset null
+    image: ${COCODEOP_SERVER_IMAGE:?set COCODEOP_SERVER_IMAGE to the verified local image ID}
+    pull_policy: never

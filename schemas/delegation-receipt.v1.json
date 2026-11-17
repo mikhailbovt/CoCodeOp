@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/DelegationReceipt"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "DelegationGrant": {
+      "type": "object",
+      "properties": {
+        "attempts_used": {
+          "type": "integer",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "grant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "grantee_agent_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "issuer_agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "limits": {
+          "$ref": "#/$defs/DelegationLimits"
+        },
+        "owner_user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "parent_grant_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "revoked_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "subtasks_used": {
+          "type": "integer",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "team_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "grant_id",
+        "task_id",
+        "workspace_id",
+        "team_id",
+        "owner_user_id",
+        "grantee_agent_id",
+        "limits",
+        "attempts_used",
+        "subtasks_used",
+        "revision"
+      ]
+    },
+    "DelegationLimits": {
+      "type": "object",
+      "properties": {
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "max_subtasks": {
+          "type": "integer",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "remaining_depth": {
+          "type": "integer",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0
+        },
+        "runtime_template_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "remaining_depth",
+        "expires_at",
+        "max_attempts",
+        "max_subtasks",
+        "runtime_template_ids"
+      ]
+    },
+    "DelegationReceipt": {
+      "type": "object",
+      "properties": {
+        "event_cursor": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "grant": {
+          "$ref": "#/$defs/DelegationGrant"
+        },
+        "task_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        }
+      },
+      "required": [
+        "grant",
+        "event_cursor"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    }
+  }
+}

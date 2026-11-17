@@ -1,0 +1,13 @@
+{
+  "name": "cocodeop-local",
+  "owner": {
+    "name": "CoCodeOp"
+  },
+  "plugins": [
+    {
+      "name": "cocodeop",
+      "source": "./plugins/cocodeop",
+      "description": "Connect a tech lead to a self-hosted CoCodeOp workspace."
+    }
+  ]
+}

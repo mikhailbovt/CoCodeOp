@@ -1,0 +1,29 @@
+[package]
+name = "office-runner"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+clap.workspace = true
+uuid.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+axum.workspace = true
+base64.workspace = true
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+getrandom.workspace = true
+office-checkout.workspace = true
+office-domain.workspace = true
+office-protocol.workspace = true
+hex.workspace = true
+reqwest.workspace = true
+rustix = { workspace = true, features = ["process"] }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+sse-stream = "0.2"
+tempfile.workspace = true
+tokio = { workspace = true, features = ["process"] }
+tokio-util = "0.7"

@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/ProjectCheckout"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "CheckoutMode": {
+      "type": "string",
+      "enum": [
+        "shared"
+      ]
+    },
+    "CheckoutState": {
+      "type": "string",
+      "enum": [
+        "pending_registration",
+        "registered"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "PathRule": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "file"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "directory"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "tree"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "ProjectCheckout": {
+      "type": "object",
+      "properties": {
+        "baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceBaseline"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "checkout_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "host_runner_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "manifest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceManifest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mode": {
+          "$ref": "#/$defs/CheckoutMode"
+        },
+        "project_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "root_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "state": {
+          "$ref": "#/$defs/CheckoutState"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "write_strategy": {
+          "$ref": "#/$defs/WriteStrategy"
+        }
+      },
+      "required": [
+        "checkout_id",
+        "workspace_id",
+        "project_id",
+        "host_runner_id",
+        "mode",
+        "write_strategy",
+        "state",
+        "revision"
+      ]
+    },
+    "SourceBaseline": {
+      "type": "object",
+      "properties": {
+        "file_count": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "manifest_sha256": {
+          "type": "string"
+        },
+        "total_bytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "manifest_sha256",
+        "file_count",
+        "total_bytes"
+      ]
+    },
+    "SourceManifest": {
+      "type": "object",
+      "properties": {
+        "exclude": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "include"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    },
+    "WriteStrategy": {
+      "type": "string",
+      "enum": [
+        "mediated"
+      ]
+    }
+  }
+}

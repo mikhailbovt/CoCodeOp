@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DoctorReport",
+  "type": "object",
+  "properties": {
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DoctorCheck"
+      }
+    }
+  },
+  "required": [
+    "checks"
+  ],
+  "$defs": {
+    "DoctorCheck": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/DoctorStatus"
+        }
+      },
+      "required": [
+        "component",
+        "status",
+        "detail"
+      ]
+    },
+    "DoctorStatus": {
+      "type": "string",
+      "enum": [
+        "passed",
+        "failed",
+        "skipped"
+      ]
+    }
+  }
+}

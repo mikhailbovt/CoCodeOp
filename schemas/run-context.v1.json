@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RunContextView",
+  "type": "object",
+  "properties": {
+    "activation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RunActivation"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "continuation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RunContinuation"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "executor": {
+      "$ref": "#/$defs/Recipient"
+    },
+    "required_read_paths": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SourcePath"
+      }
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scope_revision": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "task": {
+      "$ref": "#/$defs/ExecutionTaskBrief"
+    },
+    "worker_instructions": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WorkerInstructions"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "workspace_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "workspace_id",
+    "run_id",
+    "executor",
+    "task"
+  ],
+  "$defs": {
+    "ActivationSource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "string"
+            },
+            "channel_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "kind": {
+              "type": "string",
+              "const": "message"
+            },
+            "message_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "question_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "question_open": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "event_id",
+            "channel_id",
+            "question_id",
+            "message_id",
+            "body",
+            "question_open"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "event_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "kind": {
+              "type": "string",
+              "const": "task"
+            },
+            "result_run_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "task_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "trigger_revision": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "required": [
+            "kind",
+            "event_id",
+            "task_id",
+            "trigger_revision"
+          ]
+        }
+      ]
+    },
+    "ActivationTrigger": {
+      "type": "string",
+      "enum": [
+        "assignment",
+        "question",
+        "review_request",
+        "answer"
+      ]
+    },
+    "ExecutionTaskBrief": {
+      "type": "object",
+      "properties": {
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checkout_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "criteria_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "objective": {
+          "type": "string"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "task_revision": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "task_id",
+        "task_revision",
+        "objective",
+        "criteria_revision",
+        "acceptance_criteria"
+      ]
+    },
+    "Recipient": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "user_id"
+      ]
+    },
+    "RunActivation": {
+      "type": "object",
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ActivationSource"
+          }
+        },
+        "thread_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "trigger": {
+          "$ref": "#/$defs/ActivationTrigger"
+        }
+      },
+      "required": [
+        "trigger",
+        "thread_id",
+        "sources"
+      ]
+    },
+    "RunContinuation": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string"
+        },
+        "checkpoint_id": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "run_id",
+        "checkpoint_id",
+        "question",
+        "answer"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    },
+    "WorkerInstructions": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "type": "string"
+        },
+        "instructions": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "revision",
+        "display_name",
+        "instructions"
+      ]
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GatewaySearchReceipt",
+  "type": "object",
+  "properties": {
+    "checkout_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "coordinator_epoch": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "host_runner_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "matches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/GatewaySearchMatch"
+      }
+    },
+    "read_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scope_revision": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "truncated": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "read_id",
+    "checkout_id",
+    "host_runner_id",
+    "coordinator_epoch",
+    "scope_revision",
+    "matches",
+    "truncated"
+  ],
+  "$defs": {
+    "GatewaySearchMatch": {
+      "type": "object",
+      "properties": {
+        "file_sha256": {
+          "type": "string"
+        },
+        "line_number": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "path": {
+          "$ref": "#/$defs/SourcePath"
+        },
+        "snippet": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "line_number",
+        "file_sha256",
+        "snippet"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    }
+  }
+}

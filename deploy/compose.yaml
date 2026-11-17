@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:18.7-bookworm@sha256:ece55f7868da684e400f82f1030a050718adbdd65c23aa500c486f6e2950dc0f
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: cocodeop
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_admin
+    secrets:
+      - postgres_admin
+      - cocodeop_database
+    volumes:
+      - database:/var/lib/postgresql
+      - ./init-db.sh:/docker-entrypoint-initdb.d/00-role.sh:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "cocodeop", "-h", "127.0.0.1"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  server:
+    build:
+      context: ..
+      dockerfile: deploy/office-server.Dockerfile
+    environment:
+      OFFICE_LISTEN: 0.0.0.0:8400
+      OFFICE_ALLOW_PRIVATE_HTTP: "true"
+      OFFICE_DATABASE_URL: postgres://cocodeop@db/cocodeop?sslmode=disable
+      OFFICE_DATABASE_PASSWORD_FILE: /run/secrets/cocodeop_database
+      OFFICE_EVENT_RETAIN_COUNT: ${COCODEOP_EVENT_RETAIN_COUNT:-100000}
+    secrets:
+      - cocodeop_database
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${COCODEOP_HTTP_PORT:-8400}:8400"
+    read_only: true
+    stop_grace_period: 20s
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/office", "status"]
+      interval: 2s
+      timeout: 6s
+      retries: 15
+
+secrets:
+  postgres_admin:
+    file: ${COCODEOP_SECRETS_DIR:?set COCODEOP_SECRETS_DIR}/postgres-admin
+  cocodeop_database:
+    file: ${COCODEOP_SECRETS_DIR:?set COCODEOP_SECRETS_DIR}/cocodeop-db
+
+volumes:
+  database:

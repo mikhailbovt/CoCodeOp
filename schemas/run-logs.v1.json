@@ -1,0 +1,502 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/RunLog"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "BackendCost": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "meter": {
+              "type": "string"
+            },
+            "quality": {
+              "type": "string",
+              "const": "reported"
+            },
+            "usd_micros": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "quality",
+            "usd_micros",
+            "meter"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "pricing_revision": {
+              "type": "string"
+            },
+            "quality": {
+              "type": "string",
+              "const": "estimated"
+            },
+            "usd_micros": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "quality",
+            "usd_micros",
+            "pricing_revision"
+          ]
+        }
+      ]
+    },
+    "BackendEvidence": {
+      "type": "object",
+      "properties": {
+        "backend": {
+          "type": "string"
+        },
+        "checkpoint_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cost": {
+          "description": "Absence means the provider cost is unknown, including subscription runs.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BackendCost"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event_count": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "events_sha256": {
+          "type": "string"
+        },
+        "exit_code": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "session_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "terminal_state": {
+          "$ref": "#/$defs/BackendState"
+        },
+        "usage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BackendUsage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "backend",
+        "terminal_state",
+        "event_count",
+        "events_sha256"
+      ]
+    },
+    "BackendState": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "failed",
+        "input_required"
+      ]
+    },
+    "BackendUsage": {
+      "type": "object",
+      "properties": {
+        "cache_write_input_tokens": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "cached_input_tokens": {
+          "type": "integer",
+          "format": "uint64",
+          "default": 0,
+          "minimum": 0
+        },
+        "input_tokens": {
+          "description": "Total input, including tokens read from and written to the provider cache.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "description": "Total output, including reasoning tokens when the backend reports them.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "reasoning_output_tokens": {
+          "type": "integer",
+          "format": "uint64",
+          "default": 0,
+          "minimum": 0
+        }
+      },
+      "required": [
+        "input_tokens",
+        "output_tokens"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "Recipient": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "user_id"
+      ]
+    },
+    "Run": {
+      "type": "object",
+      "properties": {
+        "attempt_number": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "backend": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BackendEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ended_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "executor": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "instance_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "lease": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunLease"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "runtime_template_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "$ref": "#/$defs/RunStatus"
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "waiting_until": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "run_id",
+        "task_id",
+        "workspace_id",
+        "attempt_number",
+        "executor",
+        "status",
+        "started_at"
+      ]
+    },
+    "RunLease": {
+      "type": "object",
+      "properties": {
+        "job_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "lease_until": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "run_fence": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "runner_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "job_id",
+        "runner_id",
+        "run_fence",
+        "lease_until"
+      ]
+    },
+    "RunLog": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RunLogEvent"
+          }
+        },
+        "next_after": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "run": {
+          "$ref": "#/$defs/Run"
+        }
+      },
+      "required": [
+        "run",
+        "events"
+      ]
+    },
+    "RunLogEvent": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "detail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "event_type",
+        "created_at"
+      ]
+    },
+    "RunStatus": {
+      "type": "string",
+      "enum": [
+        "starting",
+        "start_unknown",
+        "running",
+        "waiting_input",
+        "paused",
+        "succeeded",
+        "failed",
+        "cancel_requested",
+        "cancelled",
+        "lost",
+        "unknown"
+      ]
+    }
+  }
+}

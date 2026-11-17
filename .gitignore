@@ -1,0 +1,4 @@
+/target/
+/.cocodeop-test/
+/tests/**/__pycache__/
+/deploy/__pycache__/

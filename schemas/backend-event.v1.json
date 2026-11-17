@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BackendEvent",
+  "description": "One line on an approved bridge's stdout. Additional fields are forward-compatible.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "integer",
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "started"
+        },
+        "session_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "session_id"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "progress"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "successful": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "tool": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "phase"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "message"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "text"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "input_required"
+        },
+        "question": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "question"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "attachment": {
+          "$ref": "#/$defs/ResultAttachment"
+        },
+        "kind": {
+          "type": "string",
+          "const": "artifact"
+        }
+      },
+      "required": [
+        "kind",
+        "attachment"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "usage"
+        },
+        "usage": {
+          "$ref": "#/$defs/BackendUsage"
+        }
+      },
+      "required": [
+        "kind",
+        "usage"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "cost": {
+          "$ref": "#/$defs/BackendCost"
+        },
+        "kind": {
+          "type": "string",
+          "const": "cost"
+        }
+      },
+      "required": [
+        "kind",
+        "cost"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "checkpoint_id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "const": "checkpoint"
+        }
+      },
+      "required": [
+        "kind",
+        "checkpoint_id"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "completed"
+        },
+        "summary": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "summary"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "failed"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "reason"
+      ]
+    }
+  ],
+  "required": [
+    "version"
+  ],
+  "$defs": {
+    "ArtifactFormat": {
+      "type": "string",
+      "enum": [
+        "text",
+        "json",
+        "diff"
+      ]
+    },
+    "BackendCost": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "meter": {
+              "type": "string"
+            },
+            "quality": {
+              "type": "string",
+              "const": "reported"
+            },
+            "usd_micros": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "quality",
+            "usd_micros",
+            "meter"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "pricing_revision": {
+              "type": "string"
+            },
+            "quality": {
+              "type": "string",
+              "const": "estimated"
+            },
+            "usd_micros": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "quality",
+            "usd_micros",
+            "pricing_revision"
+          ]
+        }
+      ]
+    },
+    "BackendUsage": {
+      "type": "object",
+      "properties": {
+        "cache_write_input_tokens": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "cached_input_tokens": {
+          "type": "integer",
+          "format": "uint64",
+          "default": 0,
+          "minimum": 0
+        },
+        "input_tokens": {
+          "description": "Total input, including tokens read from and written to the provider cache.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "description": "Total output, including reasoning tokens when the backend reports them.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "reasoning_output_tokens": {
+          "type": "integer",
+          "format": "uint64",
+          "default": 0,
+          "minimum": 0
+        }
+      },
+      "required": [
+        "input_tokens",
+        "output_tokens"
+      ]
+    },
+    "ResultAttachment": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "format": {
+          "$ref": "#/$defs/ArtifactFormat"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "format",
+        "content"
+      ]
+    }
+  }
+}

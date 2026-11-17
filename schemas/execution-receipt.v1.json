@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/ExecutionReceipt"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "ExecutionJob": {
+      "type": "object",
+      "properties": {
+        "checkout_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "current_run_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "ended_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "enqueued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "job_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "managed_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "owner_user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reserved_units": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "retry_not_before": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "runtime_template_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scope_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "scope_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "state": {
+          "$ref": "#/$defs/ExecutionState"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "task_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "team_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "terminal_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionTerminalReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "worker_agent_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "job_id",
+        "workspace_id",
+        "task_id",
+        "task_revision",
+        "owner_user_id",
+        "worker_agent_id",
+        "runtime_template_id",
+        "revision",
+        "state",
+        "reserved_units",
+        "enqueued_at"
+      ]
+    },
+    "ExecutionReceipt": {
+      "type": "object",
+      "properties": {
+        "event_cursor": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "job": {
+          "$ref": "#/$defs/ExecutionJob"
+        }
+      },
+      "required": [
+        "job",
+        "event_cursor"
+      ]
+    },
+    "ExecutionState": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "leased",
+        "reconcile_required",
+        "cancelled",
+        "dead_letter",
+        "completed",
+        "waiting_input",
+        "resumed"
+      ]
+    },
+    "ExecutionTerminalReason": {
+      "type": "string",
+      "enum": [
+        "attempt_limit",
+        "eligibility_changed",
+        "start_interrupted",
+        "execution_failed",
+        "input_expired",
+        "emergency_stopped",
+        "restore_review_required"
+      ]
+    }
+  }
+}

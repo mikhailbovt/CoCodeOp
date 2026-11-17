@@ -1,0 +1,531 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActivationReview",
+  "type": "object",
+  "properties": {
+    "result": {
+      "$ref": "#/$defs/TaskResult"
+    },
+    "task": {
+      "$ref": "#/$defs/Task"
+    }
+  },
+  "required": [
+    "task",
+    "result"
+  ],
+  "$defs": {
+    "AgentReportedCheck": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/ReportedCheckOutcome"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "outcome",
+        "notes"
+      ]
+    },
+    "ArtifactFormat": {
+      "type": "string",
+      "enum": [
+        "text",
+        "json",
+        "diff"
+      ]
+    },
+    "Recipient": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "user_id"
+      ]
+    },
+    "ReportedCheckOutcome": {
+      "type": "string",
+      "enum": [
+        "passed",
+        "failed",
+        "skipped",
+        "unknown"
+      ]
+    },
+    "ResultArtifact": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "content_sha256": {
+          "type": "string"
+        },
+        "format": {
+          "$ref": "#/$defs/ArtifactFormat"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "format",
+        "content",
+        "content_sha256"
+      ]
+    },
+    "ResultBinding": {
+      "type": "object",
+      "properties": {
+        "criteria_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "criteria_sha256": {
+          "type": "string"
+        },
+        "result_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "result_sha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "result_revision",
+        "result_sha256",
+        "criteria_revision",
+        "criteria_sha256"
+      ]
+    },
+    "ResultReview": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "$ref": "#/$defs/ReviewDecision"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewer": {
+          "$ref": "#/$defs/Recipient"
+        }
+      },
+      "required": [
+        "reviewer",
+        "decision",
+        "reason",
+        "reviewed_at"
+      ]
+    },
+    "ReviewDecision": {
+      "type": "string",
+      "enum": [
+        "accept",
+        "request_changes"
+      ]
+    },
+    "ReviewPolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "accountable"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "explicit_reviewer"
+            },
+            "reviewer": {
+              "$ref": "#/$defs/Recipient"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reviewer"
+          ]
+        }
+      ]
+    },
+    "Subject": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "human"
+            },
+            "user_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "user_id"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "agent_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "kind": {
+              "type": "string",
+              "const": "agent"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "agent_id"
+          ]
+        }
+      ]
+    },
+    "Task": {
+      "type": "object",
+      "properties": {
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptance_criteria_revision": {
+          "type": "integer",
+          "format": "int64",
+          "default": 1
+        },
+        "accountable": {
+          "$ref": "#/$defs/Subject"
+        },
+        "assignee": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Recipient"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "author": {
+          "$ref": "#/$defs/Subject"
+        },
+        "block_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TaskBlockReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "delegation_grant_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskDependency"
+          }
+        },
+        "execution": {
+          "$ref": "#/$defs/TaskExecution"
+        },
+        "objective": {
+          "type": "string"
+        },
+        "owner_user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "parent_task_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "review_policy": {
+          "$ref": "#/$defs/ReviewPolicy"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "status": {
+          "$ref": "#/$defs/TaskStatus"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "team_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "task_id",
+        "workspace_id",
+        "owner_user_id",
+        "author",
+        "accountable",
+        "status",
+        "revision",
+        "objective",
+        "acceptance_criteria",
+        "execution",
+        "review_policy",
+        "dependencies",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "TaskBlockReason": {
+      "type": "string",
+      "enum": [
+        "awaiting_owner",
+        "review_escalation"
+      ]
+    },
+    "TaskDependency": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/TaskStatus"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "task_id",
+        "status"
+      ]
+    },
+    "TaskExecution": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "coordination"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "checkout_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "kind": {
+              "type": "string",
+              "const": "coding"
+            },
+            "work_scope_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            },
+            "work_scope_revision": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "TaskResult": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "binding": {
+          "$ref": "#/$defs/ResultBinding"
+        },
+        "content": {
+          "$ref": "#/$defs/TaskResultContent"
+        },
+        "result_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultReview"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "submitted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "result_id",
+        "workspace_id",
+        "task_id",
+        "run_id",
+        "author",
+        "binding",
+        "content",
+        "submitted_at"
+      ]
+    },
+    "TaskResultContent": {
+      "type": "object",
+      "properties": {
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_reported_checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AgentReportedCheck"
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResultArtifact"
+          }
+        },
+        "criteria_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "summary": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary",
+        "criteria_revision",
+        "acceptance_criteria",
+        "artifacts",
+        "agent_reported_checks"
+      ]
+    },
+    "TaskStatus": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "ready",
+        "assigned",
+        "in_progress",
+        "blocked",
+        "in_review",
+        "changes_requested",
+        "done",
+        "cancelled",
+        "failed"
+      ]
+    }
+  }
+}

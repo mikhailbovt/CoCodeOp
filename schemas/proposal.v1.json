@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/Proposal"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "Proposal": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "content": {
+          "$ref": "#/$defs/ProposalContent"
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "decision_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "escalated_to": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "proposal_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "required_approvers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Recipient"
+          }
+        },
+        "responses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProposalResponse"
+          }
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "state": {
+          "$ref": "#/$defs/ProposalState"
+        },
+        "target": {
+          "$ref": "#/$defs/ProposalTarget"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "workspace_id",
+        "revision",
+        "author",
+        "target",
+        "content",
+        "required_approvers",
+        "responses",
+        "deadline",
+        "state"
+      ]
+    },
+    "ProposalContent": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProposalOption"
+          }
+        },
+        "problem": {
+          "type": "string"
+        },
+        "recommendation": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "problem",
+        "options",
+        "recommendation"
+      ]
+    },
+    "ProposalDecision": {
+      "type": "string",
+      "enum": [
+        "approve",
+        "reject",
+        "request_changes"
+      ]
+    },
+    "ProposalOption": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "description"
+      ]
+    },
+    "ProposalResponse": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "$ref": "#/$defs/ProposalDecision"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "responder": {
+          "$ref": "#/$defs/Recipient"
+        }
+      },
+      "required": [
+        "responder",
+        "decision",
+        "reason",
+        "recorded_at"
+      ]
+    },
+    "ProposalState": {
+      "type": "string",
+      "enum": [
+        "open",
+        "changes_requested",
+        "accepted",
+        "rejected",
+        "superseded",
+        "escalated",
+        "expired"
+      ]
+    },
+    "ProposalTarget": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "workspace"
+            },
+            "required_approvers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Recipient"
+              }
+            },
+            "topic": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "topic",
+            "required_approvers"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "area_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "checkout_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "expected_area_revision": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "expected_generation": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "kind": {
+              "type": "string",
+              "const": "shared_area"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "checkout_id",
+            "area_id",
+            "expected_area_revision",
+            "expected_generation"
+          ]
+        }
+      ]
+    },
+    "Recipient": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "user_id"
+      ]
+    }
+  }
+}

@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/CheckoutHostHealth"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "CheckoutContentHead": {
+      "type": "object",
+      "properties": {
+        "checkout_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "source_sha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "checkout_revision",
+        "source_sha256"
+      ]
+    },
+    "CheckoutCoordinatorLease": {
+      "type": "object",
+      "properties": {
+        "checkout_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "epoch": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "lease_until": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ready_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "runner_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stopped_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "checkout_id",
+        "runner_id",
+        "epoch",
+        "started_at",
+        "lease_until"
+      ]
+    },
+    "CheckoutHostHealth": {
+      "type": "object",
+      "properties": {
+        "applies_pending": {
+          "type": "boolean"
+        },
+        "checkout_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "head": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CheckoutContentHead"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lease": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CheckoutCoordinatorLease"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "manifest": {
+          "$ref": "#/$defs/SourceManifest"
+        },
+        "needs_reconcile": {
+          "type": "boolean"
+        },
+        "root": {
+          "$ref": "#/$defs/RootIdentity"
+        },
+        "scope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScopeDeploymentProof"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "checkout_id",
+        "root",
+        "manifest",
+        "applies_pending",
+        "needs_reconcile"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "PathRule": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "file"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "directory"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "tree"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "RootIdentity": {
+      "type": "object",
+      "properties": {
+        "ancestors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "directory_id": {
+          "type": "string"
+        },
+        "host_fingerprint": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "host_fingerprint",
+        "directory_id",
+        "ancestors"
+      ]
+    },
+    "ScopeDeploymentProof": {
+      "type": "object",
+      "properties": {
+        "deployment_sha256": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "scope_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "scope_id",
+        "revision",
+        "deployment_sha256"
+      ]
+    },
+    "SourceManifest": {
+      "type": "object",
+      "properties": {
+        "exclude": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathRule"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "include"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    }
+  }
+}

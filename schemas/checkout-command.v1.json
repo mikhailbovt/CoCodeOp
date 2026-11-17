@@ -1,0 +1,441 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CheckoutCommand",
+  "type": "object",
+  "properties": {
+    "checkout_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "command_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "coordinator_epoch": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "host_runner_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "outcome": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CheckoutCommandOutcome"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scope_revision": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "source_snapshot_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "state": {
+      "$ref": "#/$defs/CheckoutCommandState"
+    },
+    "task_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "template_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "command_id",
+    "checkout_id",
+    "task_id",
+    "run_id",
+    "template_id",
+    "host_runner_id",
+    "coordinator_epoch",
+    "scope_revision",
+    "state"
+  ],
+  "$defs": {
+    "CheckoutChange": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "executable": {
+              "type": "boolean",
+              "default": false
+            },
+            "file": {
+              "$ref": "#/$defs/CheckoutContent"
+            },
+            "kind": {
+              "type": "string",
+              "const": "create"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "file"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "before_sha256": {
+              "type": "string"
+            },
+            "executable": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "file": {
+              "$ref": "#/$defs/CheckoutContent"
+            },
+            "kind": {
+              "type": "string",
+              "const": "replace"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "before_sha256",
+            "file"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "before_sha256": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "delete"
+            },
+            "path": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "before_sha256"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "before_sha256": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "rename"
+            },
+            "source": {
+              "$ref": "#/$defs/SourcePath"
+            },
+            "target": {
+              "$ref": "#/$defs/SourcePath"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "source",
+            "target",
+            "before_sha256"
+          ]
+        }
+      ]
+    },
+    "CheckoutCommandOutcome": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "exit_code": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "files_truncated": {
+              "type": "boolean",
+              "default": false
+            },
+            "kind": {
+              "type": "string",
+              "const": "exited"
+            },
+            "log_truncated": {
+              "type": "boolean"
+            },
+            "outputs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CommandOutputFile"
+              }
+            },
+            "snapshot": {
+              "$ref": "#/$defs/CommandSnapshot"
+            },
+            "staged_changes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CheckoutChange"
+              }
+            },
+            "stderr": {
+              "type": "string"
+            },
+            "stdout": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "snapshot",
+            "exit_code",
+            "stdout",
+            "stderr",
+            "log_truncated"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "timeout"
+            },
+            "snapshot": {
+              "$ref": "#/$defs/CommandSnapshot"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "snapshot"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "interrupted"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "not_configured"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "snapshot_unavailable"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "unknown"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ]
+        }
+      ]
+    },
+    "CheckoutCommandState": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "authorized",
+        "running",
+        "finished"
+      ]
+    },
+    "CheckoutContent": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "encoding": {
+          "$ref": "#/$defs/FileEncoding"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "encoding",
+        "content"
+      ]
+    },
+    "CommandEnvironment": {
+      "type": "object",
+      "properties": {
+        "image_id": {
+          "type": "string"
+        },
+        "template_sha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "image_id",
+        "template_sha256"
+      ]
+    },
+    "CommandOutputFile": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/$defs/GatewayFile"
+        },
+        "path": {
+          "$ref": "#/$defs/SourcePath"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "file"
+      ]
+    },
+    "CommandSnapshot": {
+      "type": "object",
+      "properties": {
+        "checkout_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "environment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CommandEnvironment"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "file_count": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "source_snapshot_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "total_bytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "checkout_revision",
+        "sha256",
+        "file_count",
+        "total_bytes"
+      ]
+    },
+    "FileEncoding": {
+      "type": "string",
+      "enum": [
+        "utf8",
+        "base64"
+      ]
+    },
+    "GatewayFile": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "encoding": {
+          "$ref": "#/$defs/FileEncoding"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "size_bytes",
+        "encoding",
+        "content"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    }
+  }
+}

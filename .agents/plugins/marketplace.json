@@ -1,0 +1,15 @@
+{
+  "name": "cocodeop-local",
+  "interface": {
+    "displayName": "CoCodeOp"
+  },
+  "plugins": [
+    {
+      "name": "cocodeop",
+      "source": {
+        "source": "local",
+        "path": "./plugins/cocodeop"
+      }
+    }
+  ]
+}

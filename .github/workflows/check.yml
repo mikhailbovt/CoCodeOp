@@ -1,0 +1,138 @@
+name: Verify CoCodeOp
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - run: rustup show
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - run: cargo test --locked --workspace
+      - run: cargo install --locked cargo-deny --version 0.20.2
+      - run: cargo deny check advisories licenses sources
+      - run: cargo build --locked --release --workspace
+      - run: target/release/office schema health | diff - schemas/health.v1.json
+      - run: target/release/office schema readiness | diff - schemas/readiness.v1.json
+      - run: target/release/office schema doctor | diff - schemas/doctor.v1.json
+      - run: target/release/office schema operations-metrics | diff - schemas/operations-metrics.v1.json
+      - run: target/release/office schema checkout-host-health | diff - schemas/checkout-host-health.v1.json
+      - run: target/release/office schema identity | diff - schemas/identity.v1.json
+      - run: target/release/office schema agent | diff - schemas/agent.v1.json
+      - run: target/release/office schema runner | diff - schemas/runner.v1.json
+      - run: target/release/office schema note | diff - schemas/note.v1.json
+      - run: target/release/office schema inbox | diff - schemas/inbox.v1.json
+      - run: target/release/office schema inbox-receipt | diff - schemas/inbox-receipt.v1.json
+      - run: target/release/office schema inbox-delivery | diff - schemas/inbox-delivery.v1.json
+      - run: target/release/office schema context | diff - schemas/context.v1.json
+      - run: target/release/office schema channels | diff - schemas/channels.v1.json
+      - run: target/release/office schema message | diff - schemas/message.v1.json
+      - run: target/release/office schema thread-question | diff - schemas/thread-question.v1.json
+      - run: target/release/office schema thread | diff - schemas/thread.v1.json
+      - run: target/release/office schema search | diff - schemas/search.v1.json
+      - run: target/release/office schema task | diff - schemas/task.v1.json
+      - run: target/release/office schema task-explanation | diff - schemas/task-explanation.v1.json
+      - run: target/release/office schema run-logs | diff - schemas/run-logs.v1.json
+      - run: target/release/office schema task-mutation | diff - schemas/task-mutation.v1.json
+      - run: target/release/office schema task-page | diff - schemas/task-page.v1.json
+      - run: target/release/office schema task-result | diff - schemas/task-result.v1.json
+      - run: target/release/office schema team | diff - schemas/team.v1.json
+      - run: target/release/office schema team-page | diff - schemas/team-page.v1.json
+      - run: target/release/office schema team-invite | diff - schemas/team-invite.v1.json
+      - run: target/release/office schema team-invite-page | diff - schemas/team-invite-page.v1.json
+      - run: target/release/office schema handoff | diff - schemas/handoff.v1.json
+      - run: target/release/office schema handoff-page | diff - schemas/handoff-page.v1.json
+      - run: target/release/office schema delegation | diff - schemas/delegation.v1.json
+      - run: target/release/office schema delegation-receipt | diff - schemas/delegation-receipt.v1.json
+      - run: target/release/office schema runtime-template | diff - schemas/runtime-template.v1.json
+      - run: target/release/office schema project | diff - schemas/project.v1.json
+      - run: target/release/office schema project-receipt | diff - schemas/project-receipt.v1.json
+      - run: target/release/office schema checkout | diff - schemas/checkout.v1.json
+      - run: target/release/office schema checkout-coordinator | diff - schemas/checkout-coordinator.v1.json
+      - run: target/release/office schema checkout-head | diff - schemas/checkout-head.v1.json
+      - run: target/release/office schema checkout-snapshot | diff - schemas/checkout-snapshot.v1.json
+      - run: target/release/office schema checkout-review | diff - schemas/checkout-review.v1.json
+      - run: target/release/office schema checkout-review-receipt | diff - schemas/checkout-review-receipt.v1.json
+      - run: target/release/office schema checkout-release-policy | diff - schemas/checkout-release-policy.v1.json
+      - run: target/release/office schema checkout-release | diff - schemas/checkout-release.v1.json
+      - run: target/release/office schema gateway-read | diff - schemas/gateway-read.v1.json
+      - run: target/release/office schema gateway-search | diff - schemas/gateway-search.v1.json
+      - run: target/release/office schema gateway-status | diff - schemas/gateway-status.v1.json
+      - run: target/release/office schema checkout-change | diff - schemas/checkout-change.v1.json
+      - run: target/release/office schema checkout-command | diff - schemas/checkout-command.v1.json
+      - run: target/release/office schema checkout-receipt | diff - schemas/checkout-receipt.v1.json
+      - run: target/release/office schema checkout-grant | diff - schemas/checkout-grant.v1.json
+      - run: target/release/office schema checkout-grant-receipt | diff - schemas/checkout-grant-receipt.v1.json
+      - run: target/release/office schema command-template | diff - schemas/command-template.v1.json
+      - run: target/release/office schema work-scope | diff - schemas/work-scope.v1.json
+      - run: target/release/office schema work-scope-receipt | diff - schemas/work-scope-receipt.v1.json
+      - run: target/release/office schema scope-revocation-receipt | diff - schemas/scope-revocation-receipt.v1.json
+      - run: target/release/office schema area | diff - schemas/area.v1.json
+      - run: target/release/office schema area-receipt | diff - schemas/area-receipt.v1.json
+      - run: target/release/office schema access-request | diff - schemas/access-request.v1.json
+      - run: target/release/office schema access-request-receipt | diff - schemas/access-request-receipt.v1.json
+      - run: target/release/office schema path-claim-page | diff - schemas/path-claim-page.v1.json
+      - run: target/release/office schema path-claim-receipt | diff - schemas/path-claim-receipt.v1.json
+      - run: target/release/office schema path-handoff | diff - schemas/path-handoff.v1.json
+      - run: target/release/office schema path-handoff-receipt | diff - schemas/path-handoff-receipt.v1.json
+      - run: target/release/office schema proposal | diff - schemas/proposal.v1.json
+      - run: target/release/office schema proposal-receipt | diff - schemas/proposal-receipt.v1.json
+      - run: target/release/office schema decision | diff - schemas/decision.v1.json
+      - run: target/release/office schema area-decision | diff - schemas/area-decision.v1.json
+      - run: target/release/office schema artifact | diff - schemas/artifact.v1.json
+      - run: target/release/office schema artifact-upload | diff - schemas/artifact-upload.v1.json
+      - run: target/release/office schema artifact-chunk-receipt | diff - schemas/artifact-chunk-receipt.v1.json
+      - run: target/release/office schema artifact-cleanup | diff - schemas/artifact-cleanup.v1.json
+      - run: target/release/office schema activation-policy | diff - schemas/activation-policy.v1.json
+      - run: target/release/office schema activation-review | diff - schemas/activation-review.v1.json
+      - run: target/release/office schema managed-input | diff - schemas/managed-input.v1.json
+      - run: target/release/office schema managed-input-receipt | diff - schemas/managed-input-receipt.v1.json
+      - run: target/release/office schema managed-worker | diff - schemas/managed-worker.v1.json
+      - run: target/release/office schema managed-worker-status | diff - schemas/managed-worker-status.v1.json
+      - run: target/release/office schema execution-budget | diff - schemas/execution-budget.v1.json
+      - run: target/release/office schema workspace-budget | diff - schemas/workspace-budget.v1.json
+      - run: target/release/office schema execution-control | diff - schemas/execution-control.v1.json
+      - run: target/release/office schema execution-budget-receipt | diff - schemas/execution-budget-receipt.v1.json
+      - run: target/release/office schema execution-job | diff - schemas/execution-job.v1.json
+      - run: target/release/office schema execution-lease | diff - schemas/execution-lease.v1.json
+      - run: target/release/office schema execution-start | diff - schemas/execution-start.v1.json
+      - run: target/release/office schema execution-start-grant | diff - schemas/execution-start-grant.v1.json
+      - run: target/release/office schema execution-completion | diff - schemas/execution-completion.v1.json
+      - run: target/release/office schema run | diff - schemas/run.v1.json
+      - run: target/release/office schema run-credential | diff - schemas/run-credential.v1.json
+      - run: target/release/office schema run-context | diff - schemas/run-context.v1.json
+      - run: target/release/office schema run-work-context | diff - schemas/run-work-context.v1.json
+      - run: target/release/office schema backend-event | diff - schemas/backend-event.v1.json
+      - run: target/release/office schema backend-capabilities | diff - schemas/backend-capabilities.v1.json
+      - run: target/release/office schema execution-receipt | diff - schemas/execution-receipt.v1.json
+      - run: target/release/office schema runner-profile | diff - schemas/runner-profile.v1.json
+      - run: python3 tests/integration/m01.py
+      - run: python3 tests/integration/m02_bootstrap.py
+      - run: python3 tests/integration/m03_notes.py
+      - run: python3 tests/integration/m04_tasks.py
+      - run: python3 tests/integration/m06_reviews.py
+      - run: python3 tests/integration/m07_admission.py
+      - run: python3 tests/integration/m07_queue.py
+      - run: python3 tests/integration/m07_leases.py
+      - run: python3 tests/integration/m07_recovery.py
+      - run: python3 tests/integration/m07_start_effects.py
+      - run: python3 tests/integration/m07_completion.py
+      - run: python3 tests/integration/m08_run_credentials.py
+      - run: python3 tests/integration/m11_artifacts.py
+      - run: python3 tests/integration/m12_execution_controls.py
+      - run: python3 tests/integration/m12_workspace_budget.py
+      - run: python3 tests/integration/m13_diagnostics.py
+      - run: python3 tests/integration/m13_plugins.py
+      - run: python3 tests/integration/m13_backup.py
+      - run: python3 tests/integration/m13_workspace.py
+      - run: python3 tests/integration/m05_teams.py
+      - run: python3 tests/integration/m05_handoffs.py
+      - run: python3 tests/integration/m05_custody.py
+      - run: python3 tests/integration/m05_delegation.py
+      - run: python3 tests/integration/m05a_registry.py --owner-grants --work-scopes --areas --access --scope-revocation --path-claims --path-handoffs --decisions --decision-links --scheduler-leases --checkout-coordinator

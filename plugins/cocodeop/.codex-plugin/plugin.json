@@ -1,0 +1,13 @@
+{
+  "name": "cocodeop",
+  "version": "1.0.0",
+  "description": "Coordinate owner-local AI teams in CoCodeOp.",
+  "skills": "./skills/",
+  "mcpServers": "./.codex-mcp.json",
+  "interface": {
+    "displayName": "CoCodeOp",
+    "shortDescription": "Coordinate workers and a shared checkout via MCP.",
+    "longDescription": "Create and monitor your teams, coordinate shared code changes, and review verified results on your own CoCodeOp instance.",
+    "category": "Developer Tools"
+  }
+}

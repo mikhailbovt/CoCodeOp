@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "cocodeop": {
+      "command": "office",
+      "args": ["mcp-stdio"]
+    }
+  }
+}

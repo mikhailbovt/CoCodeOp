@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GatewayReadReceipt",
+  "type": "object",
+  "properties": {
+    "checkout_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "coordinator_epoch": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "file": {
+      "$ref": "#/$defs/GatewayFile"
+    },
+    "host_runner_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "path": {
+      "$ref": "#/$defs/SourcePath"
+    },
+    "read_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scope_revision": {
+      "type": "integer",
+      "format": "int64"
+    }
+  },
+  "required": [
+    "read_id",
+    "checkout_id",
+    "host_runner_id",
+    "coordinator_epoch",
+    "scope_revision",
+    "path",
+    "file"
+  ],
+  "$defs": {
+    "FileEncoding": {
+      "type": "string",
+      "enum": [
+        "utf8",
+        "base64"
+      ]
+    },
+    "GatewayFile": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "encoding": {
+          "$ref": "#/$defs/FileEncoding"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "size_bytes",
+        "encoding",
+        "content"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    }
+  }
+}

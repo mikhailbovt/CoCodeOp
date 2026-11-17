@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "cocodeop": {
+      "command": "office",
+      "args": ["mcp-stdio"],
+      "env_vars": ["COCODEOP_CLIENT_CONFIG", "LOCALAPPDATA", "XDG_CONFIG_HOME"]
+    }
+  }
+}

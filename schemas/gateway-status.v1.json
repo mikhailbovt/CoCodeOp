@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GatewayStatusReceipt",
+  "type": "object",
+  "properties": {
+    "checkout_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "coordinator_epoch": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/GatewayStatusEntry"
+      }
+    },
+    "host_runner_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "next_after": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SourcePath"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "read_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scope_revision": {
+      "type": "integer",
+      "format": "int64"
+    }
+  },
+  "required": [
+    "read_id",
+    "checkout_id",
+    "host_runner_id",
+    "coordinator_epoch",
+    "scope_revision",
+    "files"
+  ],
+  "$defs": {
+    "GatewayStatusEntry": {
+      "type": "object",
+      "properties": {
+        "executable": {
+          "type": "boolean"
+        },
+        "path": {
+          "$ref": "#/$defs/SourcePath"
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size_bytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "size_bytes",
+        "executable"
+      ]
+    },
+    "SourcePath": {
+      "description": "A UTF-8, relative path in the managed source tree.",
+      "type": "string"
+    }
+  }
+}

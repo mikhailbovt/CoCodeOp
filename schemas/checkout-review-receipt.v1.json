@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reply",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/CheckoutReviewReceipt"
+        }
+      },
+      "required": [
+        "result"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ]
+    }
+  ],
+  "required": [
+    "request_id",
+    "timestamp"
+  ],
+  "$defs": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "current_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ]
+    },
+    "CheckoutContentHead": {
+      "type": "object",
+      "properties": {
+        "checkout_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "source_sha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "checkout_revision",
+        "source_sha256"
+      ]
+    },
+    "CheckoutContribution": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "$ref": "#/$defs/Recipient"
+        },
+        "change_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "checkout_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "delta_sha256": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "change_id",
+        "checkout_revision",
+        "task_id",
+        "run_id",
+        "author",
+        "delta_sha256"
+      ]
+    },
+    "CheckoutReview": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "$ref": "#/$defs/CheckoutReviewContent"
+        },
+        "revision_sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision_sha256",
+        "content"
+      ]
+    },
+    "CheckoutReviewContent": {
+      "type": "object",
+      "properties": {
+        "checkout_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VerifiedCheckoutCheck"
+          }
+        },
+        "contributions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CheckoutContribution"
+          }
+        },
+        "git_tree_sha256": {
+          "type": "string"
+        },
+        "head": {
+          "$ref": "#/$defs/CheckoutContentHead"
+        },
+        "result": {
+          "$ref": "#/$defs/ResultBinding"
+        },
+        "result_run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "snapshot_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "task_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "task_revision": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "task_revision",
+        "result_run_id",
+        "result",
+        "checkout_id",
+        "snapshot_id",
+        "head",
+        "git_tree_sha256",
+        "contributions",
+        "checks"
+      ]
+    },
+    "CheckoutReviewReceipt": {
+      "type": "object",
+      "properties": {
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "review": {
+          "$ref": "#/$defs/CheckoutReview"
+        },
+        "reviewer": {
+          "$ref": "#/$defs/Recipient"
+        }
+      },
+      "required": [
+        "review",
+        "reviewer",
+        "approved_at"
+      ]
+    },
+    "CommandEnvironment": {
+      "type": "object",
+      "properties": {
+        "image_id": {
+          "type": "string"
+        },
+        "template_sha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "image_id",
+        "template_sha256"
+      ]
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "DATABASE_UNAVAILABLE",
+        "INCOMPATIBLE_SCHEMA",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "INVALID_INPUT",
+        "IDEMPOTENCY_CONFLICT",
+        "REVISION_CONFLICT",
+        "CURSOR_EXPIRED",
+        "INVALID_TRANSITION",
+        "DEPENDENCY_NOT_READY",
+        "DEPENDENCY_CYCLE",
+        "DELEGATION_CYCLE",
+        "DELEGATION_LIMIT",
+        "DELEGATION_INACTIVE",
+        "CHECKOUT_ROOT_OVERLAP",
+        "ACCESS_REQUEST_REQUIRED",
+        "PATH_CLAIMED",
+        "CLAIM_FENCE_STALE",
+        "CLAIM_RENEWAL_LIMIT",
+        "PATH_HANDOFF_PENDING",
+        "BUDGET_EXHAUSTED",
+        "EXECUTION_PAUSED",
+        "EXECUTION_CAPACITY_REACHED",
+        "MESSAGE_RATE_LIMITED",
+        "ARTIFACT_QUOTA_EXCEEDED",
+        "ARTIFACT_UPLOAD_OPEN",
+        "ARTIFACT_INCOMPLETE",
+        "ARTIFACT_DIGEST_MISMATCH",
+        "ARTIFACT_UNAVAILABLE",
+        "RUN_LEASE_STALE",
+        "COORDINATOR_STALE",
+        "CHECKOUT_OFFLINE",
+        "PATH_FORBIDDEN",
+        "SCOPE_STALE",
+        "CONTENT_CONFLICT",
+        "CONTEXT_STALE",
+        "CHECKOUT_RECONCILIATION_REQUIRED",
+        "PUBLICATION_PENDING",
+        "FILE_NOT_FOUND",
+        "NOT_FOUND"
+      ]
+    },
+    "Recipient": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "user_id"
+      ]
+    },
+    "ResultBinding": {
+      "type": "object",
+      "properties": {
+        "criteria_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "criteria_sha256": {
+          "type": "string"
+        },
+        "result_revision": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "result_sha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "result_revision",
+        "result_sha256",
+        "criteria_revision",
+        "criteria_sha256"
+      ]
+    },
+    "VerifiedCheckoutCheck": {
+      "description": "Summary for a recorded command. The full log remains under the command's read scope.",
+      "type": "object",
+      "properties": {
+        "command_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "environment": {
+          "$ref": "#/$defs/CommandEnvironment"
+        },
+        "exit_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "log_truncated": {
+          "type": "boolean"
+        },
+        "logs_sha256": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_sha256": {
+          "type": "string"
+        },
+        "source_snapshot_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "template_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "command_id",
+        "template_id",
+        "run_id",
+        "source_snapshot_id",
+        "source_sha256",
+        "environment",
+        "exit_code",
+        "logs_sha256",
+        "log_truncated"
+      ]
+    }
+  }
+}
